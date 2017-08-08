@@ -1,0 +1,20 @@
+machine:
+  node:
+    version: 6.10
+test:
+  post:
+    - mkdir -p $CIRCLE_ARTIFACTS/nyc/json_output
+    - mv .nyc_output/*.json $CIRCLE_ARTIFACTS/nyc/json_output
+    - mv .coverage $CIRCLE_ARTIFACTS/nyc/coverage
+    - cat $CIRCLE_ARTIFACTS/nyc/coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+deployment:
+  production:
+    branch: master
+    commands:
+      - npm run build
+      - aws lambda update-function-code --function-name $PROD_FUNCTION_NAME --region us-east-1 --zip-file fileb://files.zip
+  staging:
+    branch: develop
+    commands:
+      - npm run build
+      - aws lambda update-function-code --function-name $DEV_FUNCTION_NAME --region us-east-1 --zip-file fileb://files.zip
