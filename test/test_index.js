@@ -10,6 +10,8 @@ const context = describe;
 
 
 config.includeStack = true;
+// uncomment to test with credentials from .env
+// dotenv.config();
 
 describe('The Index Lambda Handler', () => {
     context('with an request event', () => {

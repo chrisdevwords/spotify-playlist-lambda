@@ -8,7 +8,6 @@ const token = require('../../../src/spotify/token');
 
 const context = describe;
 
-// dotenv.config();
 
 config.includeStack = true;
 
@@ -33,7 +32,7 @@ describe('The spotify.token.getToken method', () => {
 
         it('parses a token', (done) => {
             token
-                .getToken()
+                .getToken('foo', 'bar')
                 .then((myToken) => {
                     expect(myToken).to.be.a('string');
                     expect(myToken).to.eq(accessToken);
@@ -44,14 +43,55 @@ describe('The spotify.token.getToken method', () => {
     });
 
     context('with an unsuccessful response', () => {
-        it('throws a helpful error', (done) => {
+
+         beforeEach(() => {
+            sinon
+                .stub(request, 'post')
+                .rejects({ statusCode: 400 });
+
+        });
+
+        afterEach(() => {
+            request.post.restore();
+        });
+
+        it('throws an error with the returned status code', (done) => {
             token
-                .getToken()
+                .getToken('foo', 'bar')
                 .then(() => {
                     done('This should throw an error');
                 })
-                .catch((err) => {
-                    console.log('???', err);
+                .catch(({ statusCode, message }) => {
+                    expect(statusCode).to.eq(400);
+                    expect(message).to.eq(token.TOKEN_ERROR);
+                    done();
+                })
+                .catch(done);
+        })
+    });
+
+    context('with an internal', () => {
+
+         beforeEach(() => {
+            sinon
+                .stub(request, 'post')
+                .resolves('This is not JSON. Something is up with Spotify...');
+
+        });
+
+        afterEach(() => {
+            request.post.restore();
+        });
+
+        it('throws an error with a 500 statusCode', (done) => {
+            token
+                .getToken('foo', 'bar')
+                .then(() => {
+                    done('This should throw an error');
+                })
+                .catch(({ statusCode, message }) => {
+                    expect(statusCode).to.eq(500);
+                    expect(message).to.eq(token.TOKEN_ERROR);
                     done();
                 })
                 .catch(done);
