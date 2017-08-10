@@ -4,7 +4,7 @@ const { expect, config } = require('chai');
 const request = require('request-promise-native');
 const sinon = require('sinon');
 const dotenv = require('dotenv');
-const token = require('../../../src/spotify/token');
+const token = require('../../../src/spotify/auth');
 
 const context = describe;
 
