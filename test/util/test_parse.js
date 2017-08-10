@@ -1,7 +1,7 @@
 const { describe, it } = require('mocha');
 const { expect, config } = require('chai');
 
-const{ parseFormString } = require('../../src/util/parse');
+const { parseFormString } = require('../../src/util/parse');
 
 const context = describe;
 
