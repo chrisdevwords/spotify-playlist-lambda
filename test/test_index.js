@@ -3,7 +3,8 @@ const { beforeEach, afterEach, describe, it } = require('mocha');
 const { expect, config } = require('chai');
 const request = require('request-promise-native');
 const sinon = require('sinon');
-
+const dotenv = require('dotenv');
+const { INVALID_TOKEN } = require('../src/slack');
 const { handler } = require('../src');
 
 const context = describe;
@@ -12,11 +13,45 @@ const context = describe;
 config.includeStack = true;
 // uncomment to test with credentials from .env
 // dotenv.config();
+dotenv.config({
+    path: PATH.resolve(__dirname, '../', 'test/.test-env')
+});
 
 describe('The Index Lambda Handler', () => {
-    context('with an request event', () => {
 
-        const event = { body: {} };
+    context('with a request event without a slack token', () => {
+        const event = { };
+
+        it('sends a response body that can be parsed as JSON ', (done) => {
+            handler(event, {}, (err, resp) => {
+                try {
+                    const { text } = JSON.parse(resp.body);
+                    expect(text)
+                        .to.eq(INVALID_TOKEN);
+                    done()
+                } catch (error) {
+                    done(error);
+                }
+            });
+        });
+
+        it('sends a responseCode 401', (done) => {
+            handler(event, {}, (err, resp) => {
+                try {
+                    expect(resp.statusCode)
+                        .to.eq(401);
+                    done()
+                } catch (error) {
+                    done(error);
+                }
+            });
+        });
+    });
+
+    context('with an request event with a valid token', () => {
+
+        const slackBody = `text=foo&token=${process.env.SLACK_TOKEN}`;
+        const event = { body: slackBody };
 
         it('sends a response body', (done) => {
             handler(event, {}, (err, resp) => {
@@ -33,9 +68,9 @@ describe('The Index Lambda Handler', () => {
         it('sends a response body that can be parsed as JSON ', (done) => {
             handler(event, {}, (err, resp) => {
                 try {
-                    const { message } = JSON.parse(resp.body);
-                    expect(message)
-                        .to.eq('It works!');
+                    const { text } = JSON.parse(resp.body);
+                    expect(text)
+                        .to.eq('It works.');
                     done()
                 } catch (error) {
                     done(error);
