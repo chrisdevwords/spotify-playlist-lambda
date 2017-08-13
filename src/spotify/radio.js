@@ -14,10 +14,13 @@ const TRACK_NAME = (artist, songName) =>
     `"${songName}" by ${artist}`;
 
 const RECCOMENDED_TRACKS_ENDPOINT = `${API_BASE}/recommendations`;
+const SLACK_SUCCESS_MESSAGE = playlistName =>
+    `Playlist changed to ${playlistName}`;
 
 module.exports = {
 
     PLAYLIST_NAME,
+    SLACK_SUCCESS_MESSAGE,
 
     getRecommendationsFromTrack(trackId, trackInfo, accessToken) {
 
@@ -44,7 +47,6 @@ module.exports = {
     },
 
     createStation(playlistUri, spotifyUri, accessToken) {
-
 
         const trackId = extractFromUri(spotifyUri, 'track');
         let playlistName;
@@ -81,5 +83,24 @@ module.exports = {
                 }
                 return Promise.reject(err)
             });
+    },
+
+    playBasedOnTrack(playlistUri, trackUri, accessToken, spotifyLocalUrl) {
+
+        return this
+            .createStation(playlistUri, trackUri, accessToken)
+            .then(() =>
+                request
+                    .post({
+                        uri: `${spotifyLocalUrl}/api/spotify/playlist`,
+                        body: {
+                            playlist: playlistUri
+                        },
+                        json: true
+                    })
+            )
+            .then(resp =>
+                SLACK_SUCCESS_MESSAGE(resp.playlist.title)
+            );
     }
 };
