@@ -75,7 +75,7 @@ describe('The spotify.radio.createStation method', () => {
 
     context('With a valid access token', () => {
 
-        const token = 'BQA6zKxJtMNGsXZ0QkETPiQHhcA6qHlG6QFlrNmJ2xPv1bU9q-ggvzftAmpR-mdjxsF5TP-iUI83BzTbgTknvvuVBM9rfKLWXkSWbbQc9AAzRzbCOol3uJLtkqmjlyoP2hYWX1Y2m5BgxLpptBODf1n3BYH58jw-2__j8aF4bRmJb4qtn3DJC-zNnpH7EGpZUcU6x_iCX0wsrfl0cDuMI3N7E2Od8eL4lvWy61H3w0EVhfPovu4';
+        const token = 'avalidaccesstoken';
         const playlistUri = 'spotify:user:awpoops:playlist:5PP1I2m0uxEBb3VKLhI7bP';
 
         context('With a valid spotify track', () => {
