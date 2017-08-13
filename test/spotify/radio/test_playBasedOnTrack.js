@@ -42,8 +42,7 @@ describe('The spotify.radio.playBasedOnTrack method', () => {
             const trackUri = 'spotify:track:528kEbmXBOuMbxdn7YQAXx';
             const spotifyLocalUrl = 'http://localhost:5000';
             const playlistUri = 'spotify:user:awpoops:playlist:5PP1I2m0uxEBb3VKLhI7bP';
-            const token = 'BQDCP3FOWeE8e9a9lKUeu4JB0o1eN8UQzLvsWiyXgcr9RaPhM3o8L7XLXcopGnzl3vK4w8R_hlzy2-MW6x0PPS14b7CDMw_ctMcLUvWPLYEokMHKd9ENL-_fLwsRVhQFyHphY90hVYYthsizEWy8jdxMT_uptqf2auwAu6zhowkCxSYW9qG6F62_AkLQL5qu1t64DOmp4X8NtEP84ZGGiw11lbvGPl_wf6qS2ADuedQqxVSNoL4';
-
+            const token = 'assume_this_is_valid';
             radio
                 .playBasedOnTrack(playlistUri, trackUri, token, spotifyLocalUrl)
                 .then((message) => {
