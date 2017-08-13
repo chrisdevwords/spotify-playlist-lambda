@@ -10,6 +10,11 @@ module.exports = {
     API_BASE,
     ERROR_EXPIRED_TOKEN,
     ERROR_INVALID_TRACK_URI,
+    convertLinkToUri(link) {
+        return link
+            .replace('https://open.spotify.com', 'spotify')
+            .split('/').join(':');
+    },
     extractFromUri(uri, property) {
         const arr = uri.split(':');
         const propIndex = arr.indexOf(property);
