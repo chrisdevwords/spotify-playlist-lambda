@@ -5,7 +5,7 @@ const { extractFromUri } = require('../../src/spotify');
 const context = describe;
 
 
-describe('The extractFromUri util', () => {
+describe('#spotify.extractFromUri', () => {
     context('With a link to a playlist', () => {
 
         const uri = 'spotify:user:awpoops:playlist:5PP1I2m0uxEBb3VKLhI7bP';

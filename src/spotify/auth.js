@@ -1,6 +1,4 @@
 const request = require('request-promise-native');
-const { API_BASE } = require('../spotify');
-
 
 const TOKEN_ERROR = 'Error getting Spotify Token';
 const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
