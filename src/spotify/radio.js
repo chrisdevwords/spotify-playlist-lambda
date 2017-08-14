@@ -1,7 +1,6 @@
 const request = require('request-promise-native');
 const {
-    API_BASE,
-    extractFromUri
+    API_BASE
 } = require('../spotify');
 const playlist = require('../spotify/playlist');
 const track = require('../spotify/track');
@@ -17,10 +16,15 @@ const RECCOMENDED_TRACKS_ENDPOINT = `${API_BASE}/recommendations`;
 const SLACK_SUCCESS_MESSAGE = playlistName =>
     `Playlist changed to ${playlistName}`;
 
+const SLACK_PENDING_MESSAGE = ({ name, artist }) =>
+    `Finding tracks based on: ${TRACK_NAME(artist, name)}...`;
+
 module.exports = {
 
     PLAYLIST_NAME,
+    TRACK_NAME,
     SLACK_SUCCESS_MESSAGE,
+    SLACK_PENDING_MESSAGE,
 
     getRecommendationsFromTrack(trackId, trackInfo, accessToken) {
 
@@ -46,25 +50,19 @@ module.exports = {
             .then(({ tracks }) => tracks.map(({ uri }) => uri));
     },
 
-    createStation(playlistUri, spotifyUri, accessToken) {
+    createStation(playlistUri, trackInfo, accessToken) {
 
-        const trackId = extractFromUri(spotifyUri, 'track');
-        let playlistName;
+        const trackId = trackInfo.id;
+        const playlistName = PLAYLIST_NAME(
+            TRACK_NAME(trackInfo.artist, trackInfo.name)
+        );
 
         return track
-            .getTrackInfo(trackId, accessToken)
-            .then((info) => {
-                playlistName = PLAYLIST_NAME(
-                    TRACK_NAME(info.artist, info.name)
-                );
-                return track
-                    .getTrackFeatures(trackId, accessToken)
-                    .then(features => Object.assign(info, features))
-            })
-            .then(trackInfo =>
+            .getTrackFeatures(trackId, accessToken)
+            .then(features =>
                 this.getRecommendationsFromTrack(
                     trackId,
-                    trackInfo,
+                    Object.assign(features, trackInfo),
                     accessToken
                 )
             )

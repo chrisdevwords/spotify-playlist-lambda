@@ -4,8 +4,12 @@ const {
     TYPE_PRIVATE,
     slackResp
 } = require('./slack');
-const { convertLinkToUri } = require('./spotify');
+const {
+    convertLinkToUri,
+    extractFromUri
+} = require('./spotify');
 const radio = require('./spotify/radio');
+const track = require('./spotify/track');
 
 
 function handler(event, context, callback) {
@@ -37,23 +41,35 @@ function handler(event, context, callback) {
     } else {
 
         const trackUri = convertLinkToUri(text);
-        radio
-            .playBasedOnTrack(
-                SPOTIFY_RADIO_PLAYLIST,
-                trackUri,
-                SPOTIFY_USER_ACCESS_TOKEN,
-                SPOTIFY_LOCAL_URL
+        track
+            .getTrackInfo(
+                extractFromUri(trackUri, 'track'),
+                SPOTIFY_USER_ACCESS_TOKEN
             )
-            .then((msg) => {
-                callback(null,
-                    slackResp(msg)
-                );
-            })
             .catch((error) => {
                 callback(null,
                     slackResp(error.message)
                 );
+            })
+            .then((trackInfo) => {
+                callback(null,
+                    slackResp(radio.SLACK_PENDING_MESSAGE(trackInfo))
+                );
+                radio
+                    .playBasedOnTrack(
+                        SPOTIFY_RADIO_PLAYLIST,
+                        trackUri,
+                        SPOTIFY_USER_ACCESS_TOKEN,
+                        SPOTIFY_LOCAL_URL
+                    )
+                    .then((msg) => {
+                        console.log('Send Slack notification that this worked:', msg, response_url);
+                    })
+                    .catch(({ message }) => {
+                        console.log('Send Slack notification that this failed:', message, response_url);
+                    });
             });
+
     }
 }
 

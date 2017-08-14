@@ -14,7 +14,6 @@ const TRACK_FEATURES_ENDPOINT = trackId =>
     `${API_BASE}/audio-features/${trackId}`;
 
 module.exports = {
-
     getTrackInfo(trackId, accessToken) {
         return request.get({
             uri: TRACK_ENDPOINT(trackId),
@@ -26,7 +25,8 @@ module.exports = {
             name,
             artist:  artists.map(a => a.name).join(', '),
             artistIds: artists.map(a => extractFromUri(a.uri, 'artist')),
-            popularity
+            popularity,
+            id: trackId
         }))
             .catch((err) => {
                 if (err.error) {
@@ -60,5 +60,25 @@ module.exports = {
                 json: true
             }
         )
+        .catch((err) => {
+            if (err.error) {
+                let message;
+                switch (err.statusCode) {
+                    case 404:
+                    case 400:
+                        message = ERROR_INVALID_TRACK_URI;
+                        break;
+                    case 401:
+                        message = ERROR_EXPIRED_TOKEN;
+                        break;
+                    default:
+                        message = err.error.error.message;
+                }
+                const error = Error(message);
+                error.statusCode = err.statusCode;
+                throw error;
+            }
+            return Promise.reject(err)
+        });
     },
 };

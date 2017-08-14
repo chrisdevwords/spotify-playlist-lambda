@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 const { INVALID_TOKEN } = require('../src/slack');
 const { handler } = require('../src');
 const radio = require('../src/spotify/radio');
+const track = require('../src/spotify/track');
+
 const context = describe;
 
 
@@ -52,18 +54,26 @@ describe('The Index Lambda Handler', () => {
         const spotifyTrack = 'spotify:track:2771LMNxwf62FTAdpJMQfM';
         const slackBody = `text=${spotifyTrack}&token=foo_bar_baz`;
         const event = { body: slackBody };
-        const respMsg = radio.SLACK_SUCCESS_MESSAGE(
-            'Radio: based on "Bodak Yellow" by Cardi B'
-        );
+        const trackInfo = {
+            name: 'Bodak Yellow',
+            artist: 'Cardi B',
+            id: '2771LMNxwf62FTAdpJMQfM'
+        };
+        const respMsg = radio.SLACK_PENDING_MESSAGE(trackInfo);
 
         beforeEach(() => {
            sinon
                .stub(radio, 'playBasedOnTrack')
                .resolves(respMsg);
+
+           sinon
+               .stub(track, 'getTrackInfo')
+               .resolves(trackInfo)
         });
 
         afterEach(() => {
             radio.playBasedOnTrack.restore();
+            track.getTrackInfo.restore();
         });
 
         it('sends a response body', (done) => {
@@ -81,7 +91,6 @@ describe('The Index Lambda Handler', () => {
         it('sends a response body that can be parsed as JSON ', (done) => {
             handler(event, {}, (err, resp) => {
                 try {
-                    console.log(typeof resp.body);
                     const { text } = JSON.parse(resp.body);
                     expect(text)
                         .to.eq(respMsg);

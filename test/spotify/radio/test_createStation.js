@@ -26,7 +26,7 @@ describe('The spotify.radio.createStation method', () => {
 
         beforeEach(() => {
             sinon
-                .stub(track, 'getTrackInfo')
+                .stub(track, 'getTrackFeatures')
                 .rejects({
                     statusCode: 401,
                     message: ERROR_EXPIRED_TOKEN
@@ -34,7 +34,7 @@ describe('The spotify.radio.createStation method', () => {
         });
 
         afterEach(() => {
-            track.getTrackInfo.restore();
+            track.getTrackFeatures.restore();
         });
 
         it('rejects with a 401 status code', (done) => {
@@ -80,17 +80,14 @@ describe('The spotify.radio.createStation method', () => {
 
         context('With a valid spotify track', () => {
 
-            const trackUri = 'spotify:track:5RgFlk1fcClZd0Y4SGYhqH';
-
+            const trackInfo = {
+                name: 'She\'s Always a Woman',
+                artist: 'Billy Joel',
+                artistIds: ['6zFYqv1mOsgBRQbae3JJ9e'],
+                popularity: 70,
+                id: '5RgFlk1fcClZd0Y4SGYhqH'
+            };
             beforeEach(() => {
-                sinon
-                    .stub(track, 'getTrackInfo')
-                    .resolves({
-                        name: 'She\'s Always a Woman',
-                        artist: 'Billy Joel',
-                        artistIds: ['6zFYqv1mOsgBRQbae3JJ9e'],
-                        popularity: 70,
-                    });
 
                 sinon
                     .stub(track, 'getTrackFeatures')
@@ -115,8 +112,7 @@ describe('The spotify.radio.createStation method', () => {
                         'spotify:track:3tWBLzt1QY9A9brUfWWEPO',
                         'spotify:track:1MSXGbvydpblJZYyiMdfaa',
                         'spotify:track:7wOD54k4zprUibDaa8dYv1',
-                        'spotify:track:12nhoRghPNDChpsFaQld4a',
-                        trackUri
+                        'spotify:track:12nhoRghPNDChpsFaQld4a'
                     ]);
                 sinon
                     .stub(playlist, 'populatePlaylist')
@@ -127,7 +123,6 @@ describe('The spotify.radio.createStation method', () => {
             });
 
             afterEach(() => {
-                track.getTrackInfo.restore();
                 track.getTrackFeatures.restore();
                 radio.getRecommendationsFromTrack.restore();
                 playlist.populatePlaylist.restore();
@@ -139,7 +134,7 @@ describe('The spotify.radio.createStation method', () => {
                 radio
                     .createStation(
                         playlistUri,
-                        trackUri,
+                        trackInfo,
                         token
                     )
                     .then((message) => {
@@ -157,7 +152,7 @@ describe('The spotify.radio.createStation method', () => {
 
             beforeEach(() => {
                 sinon
-                    .stub(track, 'getTrackInfo')
+                    .stub(track, 'getTrackFeatures')
                     .rejects({
                         statusCode: 400,
                         message: ERROR_INVALID_TRACK_URI
@@ -165,7 +160,7 @@ describe('The spotify.radio.createStation method', () => {
             });
 
             afterEach(() => {
-                track.getTrackInfo.restore();
+                track.getTrackFeatures.restore();
             });
 
             const trackUri = 'spotify:foo:bar';
@@ -193,7 +188,7 @@ describe('The spotify.radio.createStation method', () => {
 
             beforeEach(() => {
                 sinon
-                    .stub(track, 'getTrackInfo')
+                    .stub(track, 'getTrackFeatures')
                     .rejects({
                         statusCode: 404,
                         message: ERROR_INVALID_TRACK_URI
@@ -201,7 +196,7 @@ describe('The spotify.radio.createStation method', () => {
             });
 
             afterEach(() => {
-                track.getTrackInfo.restore();
+                track.getTrackFeatures.restore();
             });
 
             const trackUri = 'spotify:track:xxxxxxxxxxxXXxxxxxx00x';
