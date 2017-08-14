@@ -1,9 +1,5 @@
 const { parseFormString } = require('./util/parse');
-const {
-    INVALID_TOKEN,
-    TYPE_PRIVATE,
-    slackResp
-} = require('./slack');
+const slack = require('./slack');
 const {
     convertLinkToUri,
     extractFromUri
@@ -28,14 +24,12 @@ function handler(event, context, callback) {
         response_url
     } = parseFormString(body);
 
-    console.log('INCOMING SLACK MESSAGE', body);
-
     if (token !== SLACK_TOKEN) {
         callback(null,
-            slackResp(
-                INVALID_TOKEN,
+            slack.slackResp(
+                slack.INVALID_TOKEN,
                 401,
-                TYPE_PRIVATE
+                slack.TYPE_PRIVATE
             )
         );
     } else {
@@ -48,12 +42,12 @@ function handler(event, context, callback) {
             )
             .catch((error) => {
                 callback(null,
-                    slackResp(error.message)
+                    slack.slackResp(error.message)
                 );
             })
             .then((trackInfo) => {
                 callback(null,
-                    slackResp(radio.SLACK_PENDING_MESSAGE(trackInfo))
+                    slack.slackResp(radio.SLACK_PENDING_MESSAGE(trackInfo))
                 );
                 radio
                     .playBasedOnTrack(
@@ -63,10 +57,12 @@ function handler(event, context, callback) {
                         SPOTIFY_LOCAL_URL
                     )
                     .then((msg) => {
-                        console.log('Send Slack notification that this worked:', msg, response_url);
+                        console.log('notify', response_url, msg);
+
+                        slack.notify(response_url, msg);
                     })
                     .catch(({ message }) => {
-                        console.log('Send Slack notification that this failed:', message, response_url);
+                        slack.notify(response_url, `Error creating playlist: ${message}`)
                     });
             });
 

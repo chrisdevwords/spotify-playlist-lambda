@@ -6,6 +6,7 @@ const sinon = require('sinon');
 const dotenv = require('dotenv');
 const { INVALID_TOKEN } = require('../src/slack');
 const { handler } = require('../src');
+const slack = require('../src/slack');
 const radio = require('../src/spotify/radio');
 const track = require('../src/spotify/track');
 
@@ -52,7 +53,8 @@ describe('The Index Lambda Handler', () => {
     context('with an request event with a valid token', () => {
 
         const spotifyTrack = 'spotify:track:2771LMNxwf62FTAdpJMQfM';
-        const slackBody = `text=${spotifyTrack}&token=foo_bar_baz`;
+        const notificationUri = encodeURIComponent('https://hooks.slack.com/commands/T4ZLYGVSN/227562856215/B4XvvRukWrmUzSJ0cMC0arpE');
+        const slackBody = `text=${spotifyTrack}&token=foo_bar_baz&response_url=${notificationUri}`;
         const event = { body: slackBody };
         const trackInfo = {
             name: 'Bodak Yellow',
@@ -68,12 +70,19 @@ describe('The Index Lambda Handler', () => {
 
            sinon
                .stub(track, 'getTrackInfo')
-               .resolves(trackInfo)
+               .resolves(trackInfo);
+
+           // todo assert calls
+           sinon
+               .stub(slack, 'notify')
+               .resolves({});
+
         });
 
         afterEach(() => {
             radio.playBasedOnTrack.restore();
             track.getTrackInfo.restore();
+            slack.notify.restore();
         });
 
         it('sends a response body', (done) => {
@@ -96,7 +105,8 @@ describe('The Index Lambda Handler', () => {
                         .to.eq(respMsg);
                     done()
                 } catch (error) {
-                    done(error);
+                    done(error);                        console.log('Send Slack notification that this worked:', msg, response_url);
+
                 }
             });
         });

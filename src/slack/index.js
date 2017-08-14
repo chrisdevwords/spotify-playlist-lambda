@@ -1,3 +1,4 @@
+const request = require('request-promise-native');
 const { response } = require('../util/lambda')
 
 // response types
@@ -19,5 +20,18 @@ module.exports = {
     TYPE_PUBLIC,
     TYPE_PRIVATE,
     INVALID_TOKEN,
-    slackResp
+    slackResp,
+    notify(uri, text) {
+        return request
+            .post({
+                uri,
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: {
+                    text
+                },
+                json: true
+            })
+    }
 };
