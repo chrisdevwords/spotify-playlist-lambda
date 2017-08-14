@@ -37,32 +37,37 @@ module.exports = {
     },
 
     getTrackInfo(trackId, accessToken) {
-        return request.get({
-            uri: TRACK_ENDPOINT(trackId),
-            headers: {
-                Authorization: `Bearer ${accessToken}`
-            },
-            json: true
-        }).then(({ artists, name, popularity }) => ({
-            name,
-            artist:  artists.map(a => a.name).join(', '),
-            artistIds: artists.map(a => extractFromUri(a.uri, 'artist')),
-            popularity,
-            id: trackId
-        })).catch(this.handleStatusCodeError);
+        return request
+            .get({
+                uri: TRACK_ENDPOINT(trackId),
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                },
+                json: true
+            })
+            .then(({ artists, name, popularity }) => ({
+                name,
+                artist:  artists
+                    .map(a => a.name)
+                    .join(', '),
+                artistIds: artists
+                    .map(a => extractFromUri(a.uri, 'artist')),
+                popularity,
+                id: trackId
+            }))
+            .catch(this.handleStatusCodeError);
 
     },
 
     getTrackFeatures(trackId, accessToken) {
-        return request.get(
-            {
+        return request
+            .get({
                 uri: TRACK_FEATURES_ENDPOINT(trackId),
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 },
                 json: true
-            }
-        )
-        .catch(this.handleStatusCodeError);
+            })
+            .catch(this.handleStatusCodeError);
     },
 };
