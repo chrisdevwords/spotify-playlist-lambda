@@ -24,6 +24,8 @@ function handler(event, context, callback) {
         response_url
     } = parseFormString(body);
 
+    console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
+
     if (token !== SLACK_TOKEN) {
         callback(null,
             slack.slackResp(
@@ -41,6 +43,7 @@ function handler(event, context, callback) {
                 SPOTIFY_USER_ACCESS_TOKEN
             )
             .catch((error) => {
+                console.log(error);
                 callback(null,
                     slack.slackResp(error.message)
                 );
@@ -57,11 +60,11 @@ function handler(event, context, callback) {
                         SPOTIFY_LOCAL_URL
                     )
                     .then((msg) => {
-                        console.log('notify', response_url, msg);
-
+                        console.log('notify success', response_url, msg);
                         slack.notify(response_url, msg);
                     })
                     .catch(({ message }) => {
+                        console.log('notify error', response_url, message);
                         slack.notify(response_url, `Error creating playlist: ${message}`)
                     });
             });
