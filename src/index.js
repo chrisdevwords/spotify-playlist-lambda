@@ -58,7 +58,7 @@ function handler(event, context, callback) {
                 radio
                     .playBasedOnTrack(
                         SPOTIFY_RADIO_PLAYLIST,
-                        trackUri,
+                        trackInfo,
                         SPOTIFY_USER_ACCESS_TOKEN,
                         SPOTIFY_LOCAL_URL
                     )
