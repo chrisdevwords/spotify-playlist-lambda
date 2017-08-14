@@ -61,11 +61,18 @@ function handler(event, context, callback) {
                     )
                     .then((msg) => {
                         console.log('notify success', response_url, msg);
-                        slack.notify(response_url, msg);
+                        slack.notify(
+                            response_url,
+                            msg
+                        );
                     })
                     .catch(({ message }) => {
                         console.log('notify error', response_url, message);
-                        slack.notify(response_url, `Error creating playlist: ${message}`)
+                        slack.notify(
+                            response_url,
+                            `Error creating playlist: ${message}`,
+                            slack.TYPE_PRIVATE
+                        )
                     });
             });
 
