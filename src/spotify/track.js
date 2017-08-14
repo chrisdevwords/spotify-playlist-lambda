@@ -14,6 +14,28 @@ const TRACK_FEATURES_ENDPOINT = trackId =>
     `${API_BASE}/audio-features/${trackId}`;
 
 module.exports = {
+
+    handleStatusCodeError(err) {
+        if (err.error) {
+            let message;
+            switch (err.statusCode) {
+                case 404:
+                case 400:
+                    message = ERROR_INVALID_TRACK_URI;
+                    break;
+                case 401:
+                    message = ERROR_EXPIRED_TOKEN;
+                    break;
+                default:
+                    message = err.error.error.message;
+            }
+            const error = Error(message);
+            error.statusCode = err.statusCode;
+            throw error;
+        }
+        return Promise.reject(err)
+    },
+
     getTrackInfo(trackId, accessToken) {
         return request.get({
             uri: TRACK_ENDPOINT(trackId),
@@ -27,27 +49,8 @@ module.exports = {
             artistIds: artists.map(a => extractFromUri(a.uri, 'artist')),
             popularity,
             id: trackId
-        }))
-            .catch((err) => {
-                if (err.error) {
-                    let message;
-                    switch (err.statusCode) {
-                        case 404:
-                        case 400:
-                            message = ERROR_INVALID_TRACK_URI;
-                            break;
-                        case 401:
-                            message = ERROR_EXPIRED_TOKEN;
-                            break;
-                        default:
-                            message = err.error.error.message;
-                    }
-                    const error = Error(message);
-                    error.statusCode = err.statusCode;
-                    throw error;
-                }
-                return Promise.reject(err)
-            });
+        })).catch(this.handleStatusCodeError);
+
     },
 
     getTrackFeatures(trackId, accessToken) {
@@ -60,25 +63,6 @@ module.exports = {
                 json: true
             }
         )
-        .catch((err) => {
-            if (err.error) {
-                let message;
-                switch (err.statusCode) {
-                    case 404:
-                    case 400:
-                        message = ERROR_INVALID_TRACK_URI;
-                        break;
-                    case 401:
-                        message = ERROR_EXPIRED_TOKEN;
-                        break;
-                    default:
-                        message = err.error.error.message;
-                }
-                const error = Error(message);
-                error.statusCode = err.statusCode;
-                throw error;
-            }
-            return Promise.reject(err)
-        });
+        .catch(this.handleStatusCodeError);
     },
 };
