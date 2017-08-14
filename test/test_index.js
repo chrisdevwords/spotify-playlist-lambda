@@ -6,13 +6,12 @@ const sinon = require('sinon');
 const dotenv = require('dotenv');
 const { INVALID_TOKEN } = require('../src/slack');
 const { handler } = require('../src');
-
+const radio = require('../src/spotify/radio');
 const context = describe;
 
 
 config.includeStack = true;
 // uncomment to test with credentials from .env
-// dotenv.config();
 dotenv.config({
     path: PATH.resolve(__dirname, '../', 'test/.test-env')
 });
@@ -50,8 +49,22 @@ describe('The Index Lambda Handler', () => {
 
     context('with an request event with a valid token', () => {
 
-        const slackBody = `text=foo&token=${process.env.SLACK_TOKEN}`;
+        const spotifyTrack = 'spotify:track:2771LMNxwf62FTAdpJMQfM';
+        const slackBody = `text=${spotifyTrack}&token=foo_bar_baz`;
         const event = { body: slackBody };
+        const respMsg = radio.SLACK_SUCCESS_MESSAGE(
+            'Radio: based on "Bodak Yellow" by Cardi B'
+        );
+
+        beforeEach(() => {
+           sinon
+               .stub(radio, 'playBasedOnTrack')
+               .resolves(respMsg);
+        });
+
+        afterEach(() => {
+            radio.playBasedOnTrack.restore();
+        });
 
         it('sends a response body', (done) => {
             handler(event, {}, (err, resp) => {
@@ -68,9 +81,10 @@ describe('The Index Lambda Handler', () => {
         it('sends a response body that can be parsed as JSON ', (done) => {
             handler(event, {}, (err, resp) => {
                 try {
+                    console.log(typeof resp.body);
                     const { text } = JSON.parse(resp.body);
                     expect(text)
-                        .to.eq('It works.');
+                        .to.eq(respMsg);
                     done()
                 } catch (error) {
                     done(error);
