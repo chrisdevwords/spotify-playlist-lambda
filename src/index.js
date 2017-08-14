@@ -21,7 +21,10 @@ function handler(event, context, callback) {
     const {
         text,
         token,
+        response_url
     } = parseFormString(body);
+
+    console.log('INCOMING SLACK MESSAGE', body);
 
     if (token !== SLACK_TOKEN) {
         callback(null,
