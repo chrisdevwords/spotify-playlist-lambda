@@ -21,7 +21,7 @@ module.exports = {
     TYPE_PRIVATE,
     INVALID_TOKEN,
     slackResp,
-    notify(uri, text) {
+    notify(uri, text, type = TYPE_PUBLIC) {
         return request
             .post({
                 uri,
@@ -29,7 +29,8 @@ module.exports = {
                     'content-type': 'application/json'
                 },
                 body: {
-                    text
+                    text,
+                    response_type: type
                 },
                 json: true
             })
