@@ -48,11 +48,6 @@ function handler(event, context, callback) {
             ));
         })
         .then((trackInfo) => {
-            // eslint-disable-next-line no-param-reassign
-            context.callbackWaitsForEmptyEventLoop = false;
-            callback(null, slack.slackResp(
-                radio.SLACK_PENDING_MESSAGE(trackInfo)
-            ));
             radio
                 .playBasedOnTrack(
                     SPOTIFY_RADIO_PLAYLIST,
@@ -75,6 +70,11 @@ function handler(event, context, callback) {
                         slack.TYPE_PRIVATE
                     );
                 });
+              // eslint-disable-next-line no-param-reassign
+            context.callbackWaitsForEmptyEventLoop = false;
+            callback(null, slack.slackResp(
+                radio.SLACK_PENDING_MESSAGE(trackInfo)
+            ));
         });
 }
 
