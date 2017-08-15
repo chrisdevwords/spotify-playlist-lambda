@@ -44,9 +44,7 @@ function handler(event, context, callback) {
         )
         .catch((error) => {
             callback(null, slack.slackResp(
-                radio.SLACK_PENDING_MESSAGE(
-                    error.message, slack.TYPE_PRIVATE
-                )
+                error.message, 200, slack.TYPE_PRIVATE
             ));
         })
         .then((trackInfo) => {
