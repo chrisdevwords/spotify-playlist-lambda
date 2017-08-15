@@ -27,7 +27,7 @@ function handler(event, context, callback) {
     //console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
 
     if (token !== SLACK_TOKEN) {
-        callback(null,
+        return callback(null,
             slack.slackResp(
                 slack.INVALID_TOKEN,
                 401,
@@ -78,10 +78,9 @@ function handler(event, context, callback) {
                     slack.TYPE_PRIVATE
                 );
             });
-
-        callback(null, slack.slackResp(''));
-
     }
+    return callback(null, slack.slackResp(''));
+
 }
 
 module.exports = {
