@@ -42,12 +42,19 @@ function handler(event, context, callback) {
             extractFromUri(trackUri, 'track'),
             SPOTIFY_USER_ACCESS_TOKEN
         )
+        .catch((error) => {
+            callback(null, slack.slackResp(
+                radio.SLACK_PENDING_MESSAGE(
+                    error.message, slack.TYPE_PRIVATE
+                )
+            ));
+        })
         .then((trackInfo) => {
-            slack.notify(
-                response_url,
-                radio.SLACK_PENDING_MESSAGE(trackInfo),
-                slack.TYPE_PRIVATE
-            );
+            // eslint-disable-next-line no-param-reassign
+            context.callbackWaitsForEmptyEventLoop = false;
+            callback(null, slack.slackResp(
+                radio.SLACK_PENDING_MESSAGE(trackInfo)
+            ));
             radio
                 .playBasedOnTrack(
                     SPOTIFY_RADIO_PLAYLIST,
@@ -70,18 +77,7 @@ function handler(event, context, callback) {
                         slack.TYPE_PRIVATE
                     );
                 });
-        })
-        .catch((error) => {
-            slack.notify(
-                response_url,
-                error.message,
-                slack.TYPE_PRIVATE
-            );
         });
-    // eslint-disable-next-line no-param-reassign
-    context.callbackWaitsForEmptyEventLoop = false;
-    return callback(null, slack.slackResp(''));
-
 }
 
 module.exports = {
