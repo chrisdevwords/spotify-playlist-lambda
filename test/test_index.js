@@ -61,7 +61,7 @@ describe('The Index Lambda Handler', () => {
             artist: 'Cardi B',
             id: '2771LMNxwf62FTAdpJMQfM'
         };
-        const respMsg = radio.SLACK_PENDING_MESSAGE(trackInfo);
+        const respMsg = ''; //radio.SLACK_PENDING_MESSAGE(trackInfo);
 
         beforeEach(() => {
            sinon
