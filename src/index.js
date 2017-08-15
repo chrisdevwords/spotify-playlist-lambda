@@ -24,7 +24,7 @@ function handler(event, context, callback) {
         response_url
     } = parseFormString(body);
 
-    console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
+    //console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
 
     if (token !== SLACK_TOKEN) {
         callback(null,
@@ -42,15 +42,11 @@ function handler(event, context, callback) {
                 extractFromUri(trackUri, 'track'),
                 SPOTIFY_USER_ACCESS_TOKEN
             )
-            .catch((error) => {
-                console.log(error);
-                callback(null,
-                    slack.slackResp(error.message)
-                );
-            })
             .then((trackInfo) => {
-                callback(null,
-                    slack.slackResp(radio.SLACK_PENDING_MESSAGE(trackInfo))
+                slack.notify(
+                    response_url,
+                    radio.SLACK_PENDING_MESSAGE(trackInfo),
+                    slack.TYPE_PRIVATE
                 );
                 radio
                     .playBasedOnTrack(
@@ -60,21 +56,30 @@ function handler(event, context, callback) {
                         SPOTIFY_LOCAL_URL
                     )
                     .then((msg) => {
-                        console.log('notify success', response_url, msg);
+                        //console.log('notify success', response_url, msg);
                         slack.notify(
                             response_url,
                             msg
                         );
                     })
                     .catch(({ message }) => {
-                        console.log('notify error', response_url, message);
+                        //console.log('notify error', response_url, message);
                         slack.notify(
                             response_url,
                             `Error creating playlist: ${message}`,
                             slack.TYPE_PRIVATE
-                        )
+                        );
                     });
+            })
+            .catch((error) => {
+                slack.notify(
+                    response_url,
+                    error.message,
+                    slack.TYPE_PRIVATE
+                );
             });
+
+        callback(null, slack.slackResp(''));
 
     }
 }
