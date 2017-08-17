@@ -43,6 +43,7 @@ function handler(event, context, callback) {
             SPOTIFY_USER_ACCESS_TOKEN
         )
         .then((trackInfo) => {
+            console.log('Got track info, sending notification');
             slack.notify(
                 response_url,
                 radio.SLACK_PENDING_MESSAGE(trackInfo)
@@ -71,6 +72,7 @@ function handler(event, context, callback) {
                 });
         })
         .catch((error) => {
+            console.log('error creating station. sending notification', error);
             slack.notify(
                 response_url,
                 error.message,
@@ -78,7 +80,7 @@ function handler(event, context, callback) {
             );
         });
     // eslint-disable-next-line no-param-reassign
-    context.callbackWaitsForEmptyEventLoop = false;
+    //context.callbackWaitsForEmptyEventLoop = false;
     return callback(null, slack.slackResp(''));
 
 }
