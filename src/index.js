@@ -81,7 +81,8 @@ function handler(event, context, callback) {
         });
     // eslint-disable-next-line no-param-reassign
     context.callbackWaitsForEmptyEventLoop = false;
-    return callback(null, slack.slackResp(''));
+    callback(null, slack.slackResp(''));
+    return false;
 
 }
 
