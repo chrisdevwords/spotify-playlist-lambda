@@ -80,7 +80,7 @@ function handler(event, context, callback) {
             );
         });
     // eslint-disable-next-line no-param-reassign
-    context.callbackWaitsForEmptyEventLoop = false;
+    //context.callbackWaitsForEmptyEventLoop = false;
     console.log('sending callback');
     callback(null, slack.slackResp(''));
     return false;
