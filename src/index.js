@@ -24,7 +24,7 @@ function handler(event, context, callback) {
         response_url
     } = parseFormString(body);
 
-    //console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
+    console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
 
     if (token !== SLACK_TOKEN) {
         return callback(null,
@@ -81,6 +81,7 @@ function handler(event, context, callback) {
         });
     // eslint-disable-next-line no-param-reassign
     context.callbackWaitsForEmptyEventLoop = false;
+    console.log('sending callback');
     callback(null, slack.slackResp(''));
     return false;
 
