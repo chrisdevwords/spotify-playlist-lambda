@@ -56,7 +56,7 @@ function handler(event, context, callback) {
                     SPOTIFY_LOCAL_URL
                 )
                 .then((msg) => {
-                    //console.log('notify success', response_url, msg);
+                    console.log('notify success', response_url, msg);
                     slack.notify(
                         response_url,
                         msg
