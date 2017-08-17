@@ -42,12 +42,13 @@ describe('The spotify.radio.playBasedOnTrack method', () => {
             const trackUri = 'spotify:track:528kEbmXBOuMbxdn7YQAXx';
             const spotifyLocalUrl = 'http://localhost:5000';
             const playlistUri = 'spotify:user:awpoops:playlist:5PP1I2m0uxEBb3VKLhI7bP';
+            const playlistLink = radio.PLAYLIST_LINK('awpoops', '5PP1I2m0uxEBb3VKLhI7bP');
             const token = 'assume_this_is_valid';
             radio
                 .playBasedOnTrack(playlistUri, trackUri, token, spotifyLocalUrl)
                 .then((message) => {
                     expect(message).to.equal(
-                        radio.SLACK_SUCCESS_MESSAGE(playlistName)
+                        radio.SLACK_SUCCESS_MESSAGE(playlistName, playlistLink)
                     )
                     done();
                 })

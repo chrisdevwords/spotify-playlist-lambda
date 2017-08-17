@@ -24,7 +24,7 @@ function handler(event, context, callback) {
         response_url
     } = parseFormString(body);
 
-    //console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
+    console.log('PROCESSING SLACK COMMAND', text, response_url, SPOTIFY_RADIO_PLAYLIST)
 
     if (token !== SLACK_TOKEN) {
         return callback(null,
@@ -43,10 +43,10 @@ function handler(event, context, callback) {
             SPOTIFY_USER_ACCESS_TOKEN
         )
         .then((trackInfo) => {
+            console.log('Got track info, sending notification');
             slack.notify(
                 response_url,
-                radio.SLACK_PENDING_MESSAGE(trackInfo),
-                slack.TYPE_PRIVATE
+                radio.SLACK_PENDING_MESSAGE(trackInfo)
             );
             radio
                 .playBasedOnTrack(
@@ -56,7 +56,7 @@ function handler(event, context, callback) {
                     SPOTIFY_LOCAL_URL
                 )
                 .then((msg) => {
-                    //console.log('notify success', response_url, msg);
+                    console.log('notify success', response_url, msg);
                     slack.notify(
                         response_url,
                         msg
@@ -72,13 +72,16 @@ function handler(event, context, callback) {
                 });
         })
         .catch((error) => {
+            console.log('error creating station. sending notification', error);
             slack.notify(
                 response_url,
                 error.message,
                 slack.TYPE_PRIVATE
             );
         });
-
+    // eslint-disable-next-line no-param-reassign
+    //context.callbackWaitsForEmptyEventLoop = false;
+    console.log('sending callback');
     return callback(null, slack.slackResp(''));
 
 }

@@ -1,6 +1,7 @@
 const request = require('request-promise-native');
 const {
-    API_BASE
+    API_BASE,
+    extractFromUri,
 } = require('../spotify');
 const playlist = require('../spotify/playlist');
 const track = require('../spotify/track');
@@ -13,15 +14,19 @@ const TRACK_NAME = (artist, songName) =>
     `"${songName}" by ${artist}`;
 
 const RECCOMENDED_TRACKS_ENDPOINT = `${API_BASE}/recommendations`;
-const SLACK_SUCCESS_MESSAGE = playlistName =>
-    `Playlist changed to ${playlistName}`;
+const SLACK_SUCCESS_MESSAGE = (playlistName, link) =>
+    `Playlist changed to ${playlistName}\n${link}`;
 
 const SLACK_PENDING_MESSAGE = ({ name, artist }) =>
     `Finding tracks based on: ${TRACK_NAME(artist, name)}...`;
 
+const PLAYLIST_LINK = (userId, plId) =>
+    `https://open.spotify.com/user/${userId}/playlist/${plId}`;
+
 module.exports = {
 
     PLAYLIST_NAME,
+    PLAYLIST_LINK,
     TRACK_NAME,
     SLACK_SUCCESS_MESSAGE,
     SLACK_PENDING_MESSAGE,
@@ -85,6 +90,11 @@ module.exports = {
 
     playBasedOnTrack(playlistUri, trackUri, accessToken, spotifyLocalUrl) {
 
+
+        const playlistLink =  PLAYLIST_LINK(
+            extractFromUri(playlistUri, 'user'),
+            extractFromUri(playlistUri, 'playlist')
+        );
         return this
             .createStation(playlistUri, trackUri, accessToken)
             .then(() =>
@@ -98,7 +108,7 @@ module.exports = {
                     })
             )
             .then(resp =>
-                SLACK_SUCCESS_MESSAGE(resp.playlist.title)
+                SLACK_SUCCESS_MESSAGE(resp.playlist.title, playlistLink)
             );
     }
 };
