@@ -83,7 +83,7 @@ function handler(event, context, callback) {
     //context.callbackWaitsForEmptyEventLoop = false;
     console.log('sending callback');
     callback(null, slack.slackResp(''));
-    return false;
+    return true;
 
 }
 

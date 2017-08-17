@@ -14,7 +14,7 @@ const context = describe;
 
 config.includeStack = true;
 
-describe('The spotify.playlist.populatePlaylist method', () => {
+describe.skip('The spotify.playlist.populatePlaylist method', () => {
 
     context('With an access token', () => {
 
