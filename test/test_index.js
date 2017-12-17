@@ -21,15 +21,15 @@ dotenv.config({
 
 describe('The Index Lambda Handler', () => {
 
-    context('with a request event without a slack token', () => {
-        const event = { };
+    context('with a request event without a body', () => {
+        const event = {};
 
         it('sends a response body that can be parsed as JSON ', (done) => {
             handler(event, {}, (err, resp) => {
                 try {
                     const { text } = JSON.parse(resp.body);
                     expect(text)
-                        .to.eq(INVALID_TOKEN);
+                        .to.equal('No track info.');
                     done()
                 } catch (error) {
                     done(error);
@@ -41,7 +41,7 @@ describe('The Index Lambda Handler', () => {
             handler(event, {}, (err, resp) => {
                 try {
                     expect(resp.statusCode)
-                        .to.eq(401);
+                        .to.eq(400);
                     done()
                 } catch (error) {
                     done(error);
@@ -50,29 +50,22 @@ describe('The Index Lambda Handler', () => {
         });
     });
 
-    context('with an request event with a valid token', () => {
+    context('with a request event with a valid token', () => {
 
-        const spotifyTrack = 'spotify:track:2771LMNxwf62FTAdpJMQfM';
         const notificationUri = encodeURIComponent('https://hooks.slack.com/commands/T4ZLYGVSN/227562856215/B4XvvRukWrmUzSJ0cMC0arpE');
-        const slackBody = `text=${spotifyTrack}&token=foo_bar_baz&response_url=${notificationUri}`;
-        const event = { body: slackBody };
         const trackInfo = {
             name: 'Bodak Yellow',
             artist: 'Cardi B',
             id: '2771LMNxwf62FTAdpJMQfM'
         };
-        const respMsg = ''; //radio.SLACK_PENDING_MESSAGE(trackInfo);
+        const event = { body: { track: trackInfo, response_url: notificationUri } };
+        const respMsg = 'No track info.'; //radio.SLACK_PENDING_MESSAGE(trackInfo);
 
         beforeEach(() => {
            sinon
                .stub(radio, 'playBasedOnTrack')
                .resolves(respMsg);
 
-           sinon
-               .stub(track, 'getTrackInfo')
-               .resolves(trackInfo);
-
-           // todo assert calls
            sinon
                .stub(slack, 'notify')
                .resolves({});
@@ -81,32 +74,17 @@ describe('The Index Lambda Handler', () => {
 
         afterEach(() => {
             radio.playBasedOnTrack.restore();
-            track.getTrackInfo.restore();
             slack.notify.restore();
         });
 
         it('sends a response body', (done) => {
             handler(event, {}, (err, resp) => {
                 try {
-                    expect(resp.body)
-                        .to.be.a('String');
+                    expect(JSON.parse(resp.body).statusCode)
+                        .to.eq(200);
                     done()
                 } catch (error) {
                     done(error);
-                }
-            });
-        });
-
-        it('sends a response body that can be parsed as JSON ', (done) => {
-            handler(event, {}, (err, resp) => {
-                try {
-                    const { text } = JSON.parse(resp.body);
-                    expect(text)
-                        .to.eq(respMsg);
-                    done()
-                } catch (error) {
-                    done(error);                        console.log('Send Slack notification that this worked:', msg, response_url);
-
                 }
             });
         });
