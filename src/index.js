@@ -1,7 +1,6 @@
 const slack = require('./slack');
 const { response } = require('./util/lambda');
 const radio = require('./spotify/radio');
-const track = require('./spotify/track');
 
 
 function handler(event, context, callback) {
